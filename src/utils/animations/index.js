@@ -1,0 +1,1 @@
+export { setupPageAnimations } from './pageAnimations.js';
