@@ -12,7 +12,6 @@ export const setupPageAnimations = (
 ) => {
 	if (!videoElement || !aboutElement || !containerElement) return;
 
-	// Get current breakpoint
 	const currentBreakpoint = getBreakpoint();
 	console.log(
 		`Current breakpoint: ${currentBreakpoint}, width: ${window.innerWidth}px`
@@ -22,6 +21,7 @@ export const setupPageAnimations = (
 	const imageItems = aboutSection.querySelectorAll(".image-item");
 	const imagesSection = aboutSection.querySelector(".images-section");
 	const imagesContainer = aboutSection.querySelector(".images-container");
+	const eventContainer = eventInfoElement.closest(".event-info-container");
 
 	// Initial states setup
 	gsap.set(aboutElement, {
@@ -45,36 +45,18 @@ export const setupPageAnimations = (
 			start: "top top",
 			end: "+=50%",
 			scrub: 0.5,
-			markers: true,
+			markers: false,
 			id: "first-animation",
 		},
 	});
 
 	tl.set(aboutSection, { opacity: 1, visibility: "visible" }, 0);
-
-	// Circle closes
 	tl.to(
 		videoElement,
-		{
-			clipPath: "circle(0% at 50% 50%)",
-			duration: 0.8,
-			ease: "power3.inOut",
-		},
+		{ clipPath: "circle(0% at 50% 50%)", duration: 0.8, ease: "power3.inOut" },
 		0
 	);
-
-	// Text scales
-	tl.to(
-		aboutElement,
-		{
-			scale: 1,
-			duration: 0.8,
-			ease: "power1.out",
-		},
-		0
-	);
-
-	// Images fade in
+	tl.to(aboutElement, { scale: 1, duration: 0.8, ease: "power1.out" }, 0);
 	tl.to(
 		imageItems,
 		{
@@ -91,14 +73,14 @@ export const setupPageAnimations = (
 		0.1
 	);
 
-	// SECOND ANIMATION - Moving elements into view
+	// SECOND ANIMATION
 	const secondTl = gsap.timeline({
 		scrollTrigger: {
 			trigger: ".scroll-spacer",
 			start: "25% top",
 			end: "+=70%",
 			scrub: 1.5,
-			markers: true,
+			markers: false,
 			id: "second-animation",
 		},
 	});
@@ -125,14 +107,14 @@ export const setupPageAnimations = (
 		0
 	);
 
-	// Third Animation - Horizontal Scroll
+	// THIRD ANIMATION
 	const thirdTl = gsap.timeline({
 		scrollTrigger: {
 			trigger: ".scroll-spacer",
 			start: animationConfig.thirdAnimation[currentBreakpoint].start,
 			end: animationConfig.thirdAnimation[currentBreakpoint].end,
 			scrub: animationConfig.thirdAnimation[currentBreakpoint].scrub,
-			markers: true,
+			markers: false,
 			id: "third-animation",
 		},
 	});
@@ -147,40 +129,26 @@ export const setupPageAnimations = (
 		}
 	);
 
-	// Fourth Animation - Event Info Transition
+	// FOURTH ANIMATION
 	const fourthTl = gsap.timeline({
 		scrollTrigger: {
 			trigger: ".scroll-spacer",
 			start: animationConfig.fourthAnimation[currentBreakpoint].start,
 			end: animationConfig.fourthAnimation[currentBreakpoint].end,
 			scrub: 1,
-			markers: true,
+			markers: false,
 			id: "event-info-animation",
 		},
 	});
 
 	fourthTl.to(
 		imagesSection,
-		{
-			opacity: 0,
-			duration: 0.8,
-			ease: "power2.inOut",
-			immediateRender: false,
-		},
+		{ opacity: 0, duration: 0.8, ease: "power2.inOut" },
 		0
 	);
-
-	const eventContainer = eventInfoElement.closest(".event-info-container");
-
-	// Festival info fades in
 	fourthTl.to(
 		eventContainer,
-		{
-			opacity: 1,
-			visibility: "visible",
-			duration: 0.8,
-			ease: "power2.inOut",
-		},
+		{ opacity: 1, visibility: "visible", duration: 0.8, ease: "power2.inOut" },
 		0.3
 	);
 
@@ -193,33 +161,39 @@ export const setupPageAnimations = (
 
 		fourthTl.to(
 			heading,
-			{
-				opacity: 1,
-				duration: 0.5,
-				ease: "power1.inOut",
-			},
+			{ opacity: 1, duration: 0.5, ease: "power1.inOut" },
 			0.6
 		);
-
 		fourthTl.to(
 			eventSections,
-			{
-				opacity: 1,
-				duration: 0.6,
-				stagger: 0.2,
-				ease: "power1.inOut",
-			},
+			{ opacity: 1, duration: 0.6, stagger: 0.2, ease: "power1.inOut" },
 			0.8
 		);
 	}
 
-	// Refresh ScrollTrigger after all animations are setup
+	// FIFTH ANIMATION - Scroll event cards upward!
+	const fifthTl = gsap.timeline({
+		scrollTrigger: {
+			trigger: ".scroll-spacer",
+			start: "72% top",
+			end: "100% top",
+			scrub: 1,
+			markers: false,
+			id: "events-scroll",
+		},
+	});
+
+	fifthTl.to(eventInfoElement, {
+		y: "-60%",
+		ease: "none",
+	});
+
 	ScrollTrigger.refresh();
 
 	return {
-		timelines: [tl, secondTl, thirdTl, fourthTl],
+		timelines: [tl, secondTl, thirdTl, fourthTl, fifthTl],
 		cleanup: () => {
-			[tl, secondTl, thirdTl, fourthTl].forEach((timeline) => {
+			[tl, secondTl, thirdTl, fourthTl, fifthTl].forEach((timeline) => {
 				if (timeline) timeline.kill();
 			});
 			ScrollTrigger.getAll().forEach((trigger) => {
